@@ -22,23 +22,30 @@ class ProjectService {
     return { ...project }
   }
 
-  async create(projectData) {
+async create(projectData) {
     await delay(350)
     const newProject = {
       ...projectData,
-      Id: (Math.max(...this.projects.map(p => parseInt(p.Id)), 0) + 1).toString()
+      Id: Math.max(...this.projects.map(p => parseInt(p.Id)), 0) + 1,
+      createdAt: new Date().toISOString()
     }
     this.projects.unshift(newProject)
     return { ...newProject }
   }
 
-  async update(id, projectData) {
+async update(id, projectData) {
     await delay(300)
-    const index = this.projects.findIndex(project => project.Id === id)
+    const projectId = parseInt(id)
+    const index = this.projects.findIndex(project => parseInt(project.Id) === projectId)
     if (index === -1) {
       throw new Error("Project not found")
     }
-    this.projects[index] = { ...projectData, Id: id }
+    this.projects[index] = { 
+      ...this.projects[index],
+      ...projectData, 
+      Id: projectId,
+      updatedAt: new Date().toISOString()
+    }
     return { ...this.projects[index] }
   }
 

@@ -12,7 +12,7 @@ import { taskService } from "@/services/api/taskService"
 import { projectService } from "@/services/api/projectService"
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([])
+const [tasks, setTasks] = useState([])
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -20,6 +20,7 @@ const Tasks = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [filter, setFilter] = useState("all")
+  const [projectFilter, setProjectFilter] = useState("all")
   const loadData = async () => {
     try {
       setLoading(true)
@@ -62,14 +63,19 @@ const handleTaskDetailsUpdated = (updatedTask) => {
     setSelectedTask(updatedTask) // Update selected task to reflect changes
   }
 
-  const filteredTasks = tasks.filter(task => {
-    if (filter === "all") return true
-    return task.status === filter
+const filteredTasks = tasks.filter(task => {
+    const statusMatch = filter === "all" || task.status === filter
+    const projectMatch = projectFilter === "all" || task.projectId?.toString() === projectFilter
+    return statusMatch && projectMatch
   })
 
   const getFilterCount = (status) => {
-    if (status === "all") return tasks.length
-    return tasks.filter(task => task.status === status).length
+    const projectFilteredTasks = projectFilter === "all" 
+      ? tasks 
+      : tasks.filter(task => task.projectId?.toString() === projectFilter)
+    
+    if (status === "all") return projectFilteredTasks.length
+    return projectFilteredTasks.filter(task => task.status === status).length
   }
 
   if (loading) return <Loading message="Loading tasks..." />
@@ -88,26 +94,49 @@ const handleTaskDetailsUpdated = (updatedTask) => {
         </Button>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex space-x-1 bg-surface/50 p-1 rounded-lg w-fit">
-        {[
-          { key: "all", label: "All", count: getFilterCount("all") },
-          { key: "todo", label: "To Do", count: getFilterCount("todo") },
-          { key: "inProgress", label: "In Progress", count: getFilterCount("inProgress") },
-          { key: "done", label: "Done", count: getFilterCount("done") }
-        ].map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setFilter(tab.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              filter === tab.key
-                ? "bg-primary text-background"
-                : "text-gray-400 hover:text-white hover:bg-surface"
-            }`}
+{/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Project Filter */}
+        <div className="flex items-center space-x-2">
+          <ApperIcon name="FolderOpen" size={16} className="text-gray-400" />
+          <select
+            value={projectFilter}
+            onChange={(e) => setProjectFilter(e.target.value)}
+            className="bg-surface border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:outline-none"
           >
-            {tab.label} ({tab.count})
-          </button>
-        ))}
+            <option value="all">All Projects ({tasks.length})</option>
+            {projects.map(project => {
+              const projectTaskCount = tasks.filter(task => task.projectId === project.Id).length
+              return (
+                <option key={project.Id} value={project.Id}>
+                  {project.name} ({projectTaskCount})
+                </option>
+              )
+            })}
+          </select>
+        </div>
+
+        {/* Status Filter Tabs */}
+        <div className="flex space-x-1 bg-surface/50 p-1 rounded-lg w-fit">
+          {[
+            { key: "all", label: "All", count: getFilterCount("all") },
+            { key: "todo", label: "To Do", count: getFilterCount("todo") },
+            { key: "inProgress", label: "In Progress", count: getFilterCount("inProgress") },
+            { key: "done", label: "Done", count: getFilterCount("done") }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                filter === tab.key
+                  ? "bg-primary text-background"
+                  : "text-gray-400 hover:text-white hover:bg-surface"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tasks List */}

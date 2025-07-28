@@ -1,18 +1,26 @@
-import { useState, useEffect } from "react"
-import ApperIcon from "@/components/ApperIcon"
-import ProjectCard from "@/components/molecules/ProjectCard"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import { taskService } from "@/services/api/taskService"
-import { projectService } from "@/services/api/projectService"
-
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import AddProjectModal from "@/components/molecules/AddProjectModal";
+import ProjectDetailsModal from "@/components/molecules/ProjectDetailsModal";
+import EditProjectModal from "@/components/molecules/EditProjectModal";
+import { taskService } from "@/services/api/taskService";
+import { projectService } from "@/services/api/projectService";
+import ApperIcon from "@/components/ApperIcon";
+import ProjectCard from "@/components/molecules/ProjectCard";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Tasks from "@/components/pages/Tasks";
+import Button from "@/components/atoms/Button";
 const Projects = () => {
-  const [projects, setProjects] = useState([])
+const [projects, setProjects] = useState([])
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState(null)
   const loadData = async () => {
     try {
       setLoading(true)
@@ -28,6 +36,34 @@ const Projects = () => {
     } finally {
       setLoading(false)
     }
+}
+
+  const handleProjectAdded = (newProject) => {
+    setProjects(prev => [newProject, ...prev])
+    setIsAddModalOpen(false)
+    toast.success("Project created successfully!")
+  }
+
+  const handleProjectUpdated = (updatedProject) => {
+    setProjects(prev => prev.map(p => p.Id === updatedProject.Id ? updatedProject : p))
+    setIsEditModalOpen(false)
+    setSelectedProject(null)
+    toast.success("Project updated successfully!")
+  }
+
+  const handleProjectDeleted = (projectId) => {
+    setProjects(prev => prev.filter(p => p.Id !== projectId))
+    toast.success("Project deleted successfully!")
+  }
+
+  const handleProjectClick = (project) => {
+    setSelectedProject(project)
+    setIsDetailsModalOpen(true)
+  }
+
+  const handleEditProject = (project) => {
+    setSelectedProject(project)
+    setIsEditModalOpen(true)
   }
 
   useEffect(() => {
@@ -47,19 +83,25 @@ const Projects = () => {
   }
 
   return (
-    <div className="space-y-6">
+<div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-mono font-bold text-white mb-2">Projects</h1>
           <p className="text-gray-400">Organize your tasks into meaningful projects</p>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-400">
-          <ApperIcon name="FolderOpen" size={16} />
-          <span>{projects.length} project{projects.length !== 1 ? "s" : ""}</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 text-sm text-gray-400">
+            <ApperIcon name="FolderOpen" size={16} />
+            <span>{projects.length} project{projects.length !== 1 ? "s" : ""}</span>
+          </div>
+          <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center space-x-2">
+            <ApperIcon name="Plus" size={16} />
+            <span>Add Project</span>
+          </Button>
         </div>
       </div>
 
-      {projects.length > 0 ? (
+{projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {projects.map(project => {
             const stats = getProjectStats(project.Id)
@@ -69,6 +111,9 @@ const Projects = () => {
                 project={project}
                 taskCount={stats.total}
                 completedCount={stats.completed}
+                onClick={() => handleProjectClick(project)}
+                onEdit={() => handleEditProject(project)}
+                onDelete={handleProjectDeleted}
               />
             )
           })}
@@ -76,10 +121,40 @@ const Projects = () => {
       ) : (
         <Empty
           title="No projects yet"
-          description="Projects help you organize related tasks and track progress more effectively"
+          description="Projects help you organize related tasks and track progress more effectively. Click 'Add Project' to get started."
           icon="FolderOpen"
+          action={
+            <Button onClick={() => setIsAddModalOpen(true)} className="mt-4">
+              <ApperIcon name="Plus" size={16} className="mr-2" />
+              Create Your First Project
+            </Button>
+          }
         />
       )}
+
+      {/* Modals */}
+      <AddProjectModal 
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onProjectAdded={handleProjectAdded}
+      />
+
+      <ProjectDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        project={selectedProject}
+        tasks={selectedProject ? tasks.filter(task => task.projectId === selectedProject.Id) : []}
+      />
+
+      <EditProjectModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setSelectedProject(null)
+        }}
+        project={selectedProject}
+        onProjectUpdated={handleProjectUpdated}
+      />
 
       {/* Project Stats Summary */}
       {projects.length > 0 && (
@@ -111,6 +186,7 @@ const Projects = () => {
         </div>
       )}
     </div>
+</div>
   )
 }
 
