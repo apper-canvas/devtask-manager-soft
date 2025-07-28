@@ -183,10 +183,9 @@ const [projects, setProjects] = useState([])
             </div>
             <div className="text-sm text-gray-400">Completed Tasks</div>
           </div>
-        </div>
+</div>
       )}
     </div>
-</div>
   )
 }
 
