@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* React Toastify Styles */
+@import 'react-toastify/dist/ReactToastify.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #151521;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Toast Customizations */
+.Toastify__toast-container {
+  z-index: 9999;
+}
+
+.Toastify__toast {
+  background: #1E1E2E;
+  color: #ffffff;
+  border: 1px solid #2A2A3E;
+  border-radius: 8px;
+  font-size: 14px;
+  min-height: 48px;
+}
+
+.Toastify__toast--success {
+  border-left: 4px solid #00F5A0;
+}
+
+.Toastify__toast--error {
+  border-left: 4px solid #FF3B3B;
+}
+
+.Toastify__toast--warning {
+  border-left: 4px solid #FFB800;
+}
+
+.Toastify__toast--info {
+  border-left: 4px solid #00D9FF;
+}
+
+.Toastify__progress-bar {
+  background: linear-gradient(90deg, #00D9FF, #00F5A0);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #151521;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A3E;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A4E;
+}
