@@ -78,9 +78,10 @@ setFormData({
                 className="p-2 hover:bg-gray-700 rounded-lg transition-colors">
                 <ApperIcon name="X" size={20} className="text-gray-400" />
             </button>
-        </div>
-        <div className="overflow-y-auto max-h-[calc(90vh-2rem)]">
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+</div>
+        <div className="flex flex-col max-h-[calc(90vh-8rem)]">
+            <div className="overflow-y-auto flex-1 px-6">
+<form id="add-task-form" onSubmit={handleSubmit} className="py-6 space-y-6">
                 {/* Basic Information Section */}
                 <div className="space-y-4">
                     <h3
@@ -207,14 +208,14 @@ setFormData({
                                           </div>
                     </div>
                 </div>
-                <div className="flex justify-end space-x-3 pt-6 border-t border-gray-700">
-                    <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>Cancel
-                                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Creating..." : "Create Task"}
-                    </Button>
-                </div>
-            </form>
+</form>
+            </div>
+            <div className="flex justify-end space-x-3 p-6 border-t border-gray-700 bg-surface">
+                <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
+                <Button type="submit" form="add-task-form" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating..." : "Create Task"}
+                </Button>
+            </div>
         </div>
     </div></div>
   )
