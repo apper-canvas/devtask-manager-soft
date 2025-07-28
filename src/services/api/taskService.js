@@ -6,6 +6,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 class TaskService {
   constructor() {
     this.tasks = [...tasksData]
+    this.activeTaskId = null
   }
 
   async getAll() {
@@ -52,15 +53,30 @@ class TaskService {
 return { ...deletedTask }
   }
 
-  async setActive(id) {
+async setActive(id) {
     await delay(200)
-    const task = this.tasks.find(task => task.Id === parseInt(id))
+    const taskId = parseInt(id)
+    const task = this.tasks.find(task => task.Id === taskId)
     if (!task) {
       throw new Error("Task not found")
     }
-    // In a real app, this would mark the task as active in the backend
-    // For now, we'll just simulate the API call
-    return { ...task }
+    
+    // Remove active status from all tasks
+    this.tasks.forEach(task => {
+      task.isActive = false
+    })
+    
+    // Set the selected task as active
+    const index = this.tasks.findIndex(task => task.Id === taskId)
+    this.tasks[index] = { ...this.tasks[index], isActive: true }
+    this.activeTaskId = taskId
+    
+    return { ...this.tasks[index] }
+  }
+
+  async getActiveTask() {
+    await delay(100)
+    return this.tasks.find(task => task.isActive) || null
   }
 }
 

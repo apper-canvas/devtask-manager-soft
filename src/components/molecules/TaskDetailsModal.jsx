@@ -87,10 +87,13 @@ const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated }) => {
   };
 
   const handleSetActive = async () => {
-    setIsSettingActive(true);
+setIsSettingActive(true);
     try {
       await taskService.setActive(task.Id);
       toast.success("Task set as active!");
+      // Update the task in parent component
+      const updatedTask = await taskService.getById(task.Id);
+      onTaskUpdated(updatedTask);
     } catch (error) {
       toast.error("Failed to set task as active");
     } finally {
@@ -157,14 +160,14 @@ const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated }) => {
             {!isEditing && (
               <>
                 <Button
-                  onClick={handleSetActive}
-                  disabled={isSettingActive}
+onClick={handleSetActive}
+                  disabled={isSettingActive || task.isActive}
                   variant="ghost"
                   size="sm"
-                  className="text-accent hover:bg-accent/10"
+                  className={task.isActive ? "text-accent bg-accent/10" : "text-accent hover:bg-accent/10"}
                 >
-                  <ApperIcon name="Play" size={16} className="mr-2" />
-                  {isSettingActive ? "Setting..." : "Set as Active"}
+                  <ApperIcon name={task.isActive ? "CheckCircle" : "Play"} size={16} className="mr-2" />
+                  {isSettingActive ? "Setting..." : task.isActive ? "Active Task" : "Set as Active"}
                 </Button>
                 <Button
                   onClick={() => setIsEditing(true)}

@@ -9,7 +9,8 @@ import { toast } from "react-toastify"
 const TaskCard = ({ task, project, onTaskUpdate, onTaskClick }) => {
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const handleStatusToggle = async () => {
+const handleStatusToggle = async (e) => {
+    e.stopPropagation() // Prevent modal from opening
     setIsUpdating(true)
     try {
       const statusMap = {

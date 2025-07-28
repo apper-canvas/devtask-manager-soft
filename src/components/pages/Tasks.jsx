@@ -16,7 +16,7 @@ const Tasks = () => {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [filter, setFilter] = useState("all")
@@ -55,10 +55,11 @@ const handleTaskClick = (task) => {
     setIsDetailsModalOpen(true)
   }
 
-  const handleTaskDetailsUpdated = (updatedTask) => {
+const handleTaskDetailsUpdated = (updatedTask) => {
     setTasks(prev => prev.map(task => 
       task.Id === updatedTask.Id ? updatedTask : task
     ))
+    setSelectedTask(updatedTask) // Update selected task to reflect changes
   }
 
   const filteredTasks = tasks.filter(task => {
