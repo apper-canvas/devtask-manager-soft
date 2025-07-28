@@ -6,7 +6,7 @@ import { format } from "date-fns"
 import { taskService } from "@/services/api/taskService"
 import { toast } from "react-toastify"
 
-const TaskCard = ({ task, project, onTaskUpdate }) => {
+const TaskCard = ({ task, project, onTaskUpdate, onTaskClick }) => {
   const [isUpdating, setIsUpdating] = useState(false)
 
   const handleStatusToggle = async () => {
@@ -53,7 +53,10 @@ const TaskCard = ({ task, project, onTaskUpdate }) => {
   }
 
   return (
-    <Card className="p-4 hover:border-primary/50">
+<Card 
+      className="p-4 hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-primary/10" 
+      onClick={() => onTaskClick?.(task)}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-mono font-semibold text-white mb-1">{task.title}</h3>

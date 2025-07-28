@@ -49,7 +49,18 @@ class TaskService {
       throw new Error("Task not found")
     }
     const deletedTask = this.tasks.splice(index, 1)[0]
-    return { ...deletedTask }
+return { ...deletedTask }
+  }
+
+  async setActive(id) {
+    await delay(200)
+    const task = this.tasks.find(task => task.Id === parseInt(id))
+    if (!task) {
+      throw new Error("Task not found")
+    }
+    // In a real app, this would mark the task as active in the backend
+    // For now, we'll just simulate the API call
+    return { ...task }
   }
 }
 

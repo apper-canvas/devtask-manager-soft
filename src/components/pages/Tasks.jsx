@@ -4,6 +4,7 @@ import Button from "@/components/atoms/Button"
 import ApperIcon from "@/components/ApperIcon"
 import TaskCard from "@/components/molecules/TaskCard"
 import AddTaskModal from "@/components/molecules/AddTaskModal"
+import TaskDetailsModal from "@/components/molecules/TaskDetailsModal"
 import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
@@ -15,9 +16,10 @@ const Tasks = () => {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
   const [filter, setFilter] = useState("all")
-
   const loadData = async () => {
     try {
       setLoading(true)
@@ -44,6 +46,16 @@ const Tasks = () => {
   }
 
   const handleTaskUpdate = (updatedTask) => {
+    setTasks(prev => prev.map(task => 
+      task.Id === updatedTask.Id ? updatedTask : task
+    ))
+  }
+const handleTaskClick = (task) => {
+    setSelectedTask(task)
+    setIsDetailsModalOpen(true)
+  }
+
+  const handleTaskDetailsUpdated = (updatedTask) => {
     setTasks(prev => prev.map(task => 
       task.Id === updatedTask.Id ? updatedTask : task
     ))
@@ -103,11 +115,12 @@ const Tasks = () => {
           {filteredTasks.map(task => {
             const project = projects.find(p => p.Id === task.projectId)
             return (
-              <TaskCard
+<TaskCard
                 key={task.Id}
                 task={task}
                 project={project}
                 onTaskUpdate={handleTaskUpdate}
+                onTaskClick={handleTaskClick}
               />
             )
           })}
@@ -125,11 +138,18 @@ const Tasks = () => {
         />
       )}
 
-      <AddTaskModal
+<AddTaskModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         projects={projects}
         onTaskAdded={handleTaskAdded}
+      />
+      
+      <TaskDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        task={selectedTask}
+        onTaskUpdated={handleTaskDetailsUpdated}
       />
     </div>
   )
