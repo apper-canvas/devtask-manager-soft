@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import React, { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { projectService } from "@/services/api/projectService";
 import ApperIcon from "@/components/ApperIcon";
 import Tasks from "@/components/pages/Tasks";
@@ -10,14 +10,14 @@ const ProjectCard = ({ project, taskCount, completedCount, onClick, onEdit, onDe
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const progressPercentage = taskCount > 0 ? Math.round((completedCount / taskCount) * 100) : 0
 
-  const handleDelete = async (e) => {
+const handleDelete = async (e) => {
     e.stopPropagation()
     if (showDeleteConfirm) {
       try {
         await projectService.delete(project.Id)
         onDelete(project.Id)
-        setShowDeleteConfirm(false)
       } catch (error) {
+        console.error('Error deleting project:', error)
         toast.error("Failed to delete project")
       }
     } else {
