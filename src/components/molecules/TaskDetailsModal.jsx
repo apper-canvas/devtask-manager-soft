@@ -159,15 +159,38 @@ setIsSettingActive(true);
           <div className="flex items-center gap-2">
             {!isEditing && (
               <>
-                <Button
+<Button
 onClick={handleSetActive}
-                  disabled={isSettingActive || task.isActive}
+                  disabled={isSettingActive || task.isActive || task.status === 'done'}
                   variant="ghost"
                   size="sm"
-                  className={task.isActive ? "text-accent bg-accent/10" : "text-accent hover:bg-accent/10"}
+                  className={
+                    task.status === 'done' 
+                      ? "text-success bg-success/10" 
+                      : task.isActive 
+                        ? "text-accent bg-accent/10" 
+                        : "text-accent hover:bg-accent/10"
+                  }
                 >
-                  <ApperIcon name={task.isActive ? "CheckCircle" : "Play"} size={16} className="mr-2" />
-                  {isSettingActive ? "Setting..." : task.isActive ? "Active Task" : "Set as Active"}
+                  <ApperIcon 
+                    name={
+                      task.status === 'done' 
+                        ? "CheckCircle" 
+                        : task.isActive 
+                          ? "CheckCircle" 
+                          : "Play"
+                    } 
+                    size={16} 
+                    className="mr-2" 
+                  />
+                  {isSettingActive 
+                    ? "Setting..." 
+                    : task.status === 'done' 
+                      ? "Done" 
+                      : task.isActive 
+                        ? "Active Task" 
+                        : "Set as Active"
+                  }
                 </Button>
                 <Button
                   onClick={() => setIsEditing(true)}
