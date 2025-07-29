@@ -43,15 +43,14 @@ class TaskService {
     return { ...this.tasks[index] }
   }
 
-  async delete(id) {
+async delete(id) {
     await delay(250)
     const index = this.tasks.findIndex(task => task.Id === parseInt(id))
     if (index === -1) {
       throw new Error("Task not found")
     }
     const deletedTask = this.tasks.splice(index, 1)[0]
-return { ...deletedTask }
-return { ...deletedTask }
+    return { ...deletedTask }
   }
 
   async deleteByProjectId(projectId) {
