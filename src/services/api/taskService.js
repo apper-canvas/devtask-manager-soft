@@ -51,8 +51,15 @@ class TaskService {
     }
     const deletedTask = this.tasks.splice(index, 1)[0]
 return { ...deletedTask }
+return { ...deletedTask }
   }
 
+  async deleteByProjectId(projectId) {
+    await delay(250)
+    const tasksToDelete = this.tasks.filter(task => task.projectId === parseInt(projectId))
+    this.tasks = this.tasks.filter(task => task.projectId !== parseInt(projectId))
+    return tasksToDelete
+  }
 async setActive(id) {
     await delay(200)
     const taskId = parseInt(id)

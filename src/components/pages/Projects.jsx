@@ -51,9 +51,14 @@ const [projects, setProjects] = useState([])
     toast.success("Project updated successfully!")
   }
 
-  const handleProjectDeleted = (projectId) => {
-    setProjects(prev => prev.filter(p => p.Id !== projectId))
-    toast.success("Project deleted successfully!")
+const handleProjectDeleted = async (projectId) => {
+    try {
+      await taskService.deleteByProjectId(projectId)
+      setProjects(prev => prev.filter(p => p.Id !== projectId))
+      toast.success("Project and associated tasks deleted successfully!")
+    } catch (error) {
+      toast.error("Failed to delete project")
+    }
   }
 
   const handleProjectClick = (project) => {
