@@ -1,4 +1,5 @@
 import projectsData from "@/services/mockData/projects.json"
+import { taskService } from "@/services/api/taskService"
 
 // Simulate API delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -49,12 +50,16 @@ async update(id, projectData) {
     return { ...this.projects[index] }
   }
 
-  async delete(id) {
+async delete(id) {
     await delay(250)
     const index = this.projects.findIndex(project => project.Id === id)
     if (index === -1) {
       throw new Error("Project not found")
     }
+    
+    // Delete all tasks associated with this project first
+    await taskService.deleteByProjectId(id)
+    
     const deletedProject = this.projects.splice(index, 1)[0]
     return { ...deletedProject }
   }
