@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 import { taskService } from "@/services/api/taskService";
 import { projectService } from "@/services/api/projectService";
 import ApperIcon from "@/components/ApperIcon";
 import Textarea from "@/components/atoms/Textarea";
+import Badge from "@/components/atoms/Badge";
 import Input from "@/components/atoms/Input";
 import Button from "@/components/atoms/Button";
 import Select from "@/components/atoms/Select";
-import Badge from "@/components/atoms/Badge";
-import { format } from "date-fns";
 
-const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated }) => {
+const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated, onTaskDeleted }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
@@ -25,6 +25,8 @@ const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSettingActive, setIsSettingActive] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -86,8 +88,8 @@ const TaskDetailsModal = ({ isOpen, onClose, task, onTaskUpdated }) => {
     }
   };
 
-  const handleSetActive = async () => {
-setIsSettingActive(true);
+const handleSetActive = async () => {
+    setIsSettingActive(true);
     try {
       await taskService.setActive(task.Id);
       toast.success("Task set as active!");
@@ -101,7 +103,19 @@ setIsSettingActive(true);
     }
   };
 
-  const handleCancel = () => {
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onTaskDeleted(task.Id);
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      // Error handling is done in parent component
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+const handleCancel = () => {
     setFormData({
       title: task.title || "",
       description: task.description || "",
@@ -114,7 +128,6 @@ setIsSettingActive(true);
     });
     setIsEditing(false);
   };
-
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high': return 'bg-red-500/10 text-red-400 border-red-500/20';
@@ -156,7 +169,7 @@ setIsSettingActive(true);
               </Badge>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
             {!isEditing && (
               <>
 <Button
@@ -200,6 +213,15 @@ onClick={handleSetActive}
                 >
                   <ApperIcon name="Edit" size={16} className="mr-2" />
                   Edit
+                </Button>
+                <Button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-error hover:bg-error/10"
+                >
+                  <ApperIcon name="Trash2" size={16} className="mr-2" />
+                  Delete
                 </Button>
               </>
             )}
@@ -467,7 +489,45 @@ onClick={handleSetActive}
             </div>
           )}
         </div>
-      </div>
+</div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-gray-600 rounded-lg p-6 max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-error/10 rounded-lg">
+                <ApperIcon name="AlertTriangle" size={24} className="text-error" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Delete Task</h3>
+                <p className="text-sm text-gray-400">This action cannot be undone</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete "<span className="font-medium text-white">{task.title}</span>"?
+            </p>
+            
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={() => setShowDeleteConfirm(false)}
+                variant="ghost"
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-error text-white hover:bg-error/90"
+              >
+                {isDeleting ? "Deleting..." : "Delete Task"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

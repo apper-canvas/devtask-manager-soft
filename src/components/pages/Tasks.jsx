@@ -51,7 +51,7 @@ useEffect(() => {
     return () => window.removeEventListener('focus', handleFocus)
   }, [])
 
-  const handleTaskAdded = (newTask) => {
+const handleTaskAdded = (newTask) => {
     setTasks(prev => [newTask, ...prev])
   }
 
@@ -60,6 +60,18 @@ useEffect(() => {
       task.Id === updatedTask.Id ? updatedTask : task
     ))
   }
+
+  const handleTaskDelete = async (taskId) => {
+    try {
+      await taskService.delete(taskId)
+      setTasks(prev => prev.filter(task => task.Id !== taskId))
+      setIsDetailsModalOpen(false)
+      toast.success("Task deleted successfully!")
+    } catch (error) {
+      toast.error("Failed to delete task")
+    }
+  }
+
 const handleTaskClick = (task) => {
     setSelectedTask(task)
     setIsDetailsModalOpen(true)
@@ -190,11 +202,12 @@ const handleTaskDetailsUpdated = (updatedTask) => {
         onTaskAdded={handleTaskAdded}
       />
       
-      <TaskDetailsModal
+<TaskDetailsModal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         task={selectedTask}
         onTaskUpdated={handleTaskDetailsUpdated}
+        onTaskDeleted={handleTaskDelete}
       />
     </div>
   )
