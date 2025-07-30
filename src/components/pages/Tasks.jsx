@@ -38,8 +38,17 @@ const [tasks, setTasks] = useState([])
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadData()
+  }, [])
+
+  // Reload data when window gains focus to catch external changes
+  useEffect(() => {
+    const handleFocus = () => {
+      loadData()
+    }
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [])
 
   const handleTaskAdded = (newTask) => {
@@ -63,7 +72,13 @@ const handleTaskDetailsUpdated = (updatedTask) => {
     setSelectedTask(updatedTask) // Update selected task to reflect changes
   }
 
-const filteredTasks = tasks.filter(task => {
+// Filter out tasks that reference deleted projects
+  const validTasks = tasks.filter(task => {
+    if (!task.projectId) return true
+    return projects.some(project => project.Id === task.projectId)
+  })
+
+  const filteredTasks = validTasks.filter(task => {
     const statusMatch = filter === "all" || task.status === filter
     const projectMatch = projectFilter === "all" || task.projectId?.toString() === projectFilter
     return statusMatch && projectMatch
@@ -104,9 +119,9 @@ const filteredTasks = tasks.filter(task => {
             onChange={(e) => setProjectFilter(e.target.value)}
             className="bg-surface border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:outline-none"
           >
-            <option value="all">All Projects ({tasks.length})</option>
+<option value="all">All Projects ({validTasks.length})</option>
             {projects.map(project => {
-              const projectTaskCount = tasks.filter(task => task.projectId === project.Id).length
+              const projectTaskCount = validTasks.filter(task => task.projectId === project.Id).length
               return (
                 <option key={project.Id} value={project.Id}>
                   {project.name} ({projectTaskCount})
