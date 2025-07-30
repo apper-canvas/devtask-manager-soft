@@ -14,12 +14,23 @@ class ProjectService {
     return [...this.projects]
   }
 
-  async getById(id) {
+async getById(id) {
     await delay(200)
-    const project = this.projects.find(project => project.Id === id)
-    if (!project) {
-      throw new Error("Project not found")
+    
+    // Validate ID parameter
+    if (!id) {
+      throw new Error("Project ID is required")
     }
+    
+    // Convert ID to string for consistent comparison (handles both string and number IDs)
+    const searchId = String(id)
+    const project = this.projects.find(project => String(project.Id) === searchId)
+    
+    if (!project) {
+      console.error(`Project not found. Searched for ID: "${searchId}", Available IDs: [${this.projects.map(p => `"${p.Id}"`).join(', ')}]`)
+      throw new Error(`Project not found with ID: ${searchId}`)
+    }
+    
     return { ...project }
   }
 
@@ -52,16 +63,36 @@ async update(id, projectData) {
 
 async delete(id) {
     await delay(250)
-    const index = this.projects.findIndex(project => project.Id === id)
-    if (index === -1) {
-      throw new Error("Project not found")
+    
+    // Validate ID parameter
+    if (!id) {
+      throw new Error("Project ID is required for deletion")
     }
     
-    // Delete all tasks associated with this project first
-    await taskService.deleteByProjectId(id)
+    // Convert ID to string for consistent comparison
+    const searchId = String(id)
+    const index = this.projects.findIndex(project => String(project.Id) === searchId)
     
-    const deletedProject = this.projects.splice(index, 1)[0]
-    return { ...deletedProject }
+    if (index === -1) {
+      console.error(`Project deletion failed. Searched for ID: "${searchId}", Available IDs: [${this.projects.map(p => `"${p.Id}"`).join(', ')}]`)
+      throw new Error(`Project not found with ID: ${searchId}. Cannot delete non-existent project.`)
+    }
+    
+    const projectToDelete = this.projects[index]
+    
+    try {
+      // Delete all tasks associated with this project first
+      await taskService.deleteByProjectId(searchId)
+      
+      // Remove project from array
+      const deletedProject = this.projects.splice(index, 1)[0]
+      console.log(`Successfully deleted project "${deletedProject.name}" with ID: ${searchId}`)
+      
+      return { ...deletedProject }
+    } catch (error) {
+      console.error(`Error during project deletion process for ID ${searchId}:`, error)
+      throw new Error(`Failed to delete project: ${error.message}`)
+    }
   }
 }
 

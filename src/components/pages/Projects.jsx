@@ -53,11 +53,29 @@ const [projects, setProjects] = useState([])
 
 const handleProjectDeleted = async (projectId) => {
     try {
+      // Validate project ID before attempting deletion
+      if (!projectId) {
+        toast.error("Invalid project ID provided")
+        return
+      }
+
+      // Find the project to get its name for better user feedback
+      const projectToDelete = projects.find(p => String(p.Id) === String(projectId))
+      if (!projectToDelete) {
+        toast.error("Project not found in current list")
+        return
+      }
+
+      console.log(`Deleting project: "${projectToDelete.name}" with ID: ${projectId}`)
+      
       await projectService.delete(projectId)
-      setProjects(prev => prev.filter(p => p.Id !== projectId))
-      toast.success("Project and associated tasks deleted successfully!")
+      setProjects(prev => prev.filter(p => String(p.Id) !== String(projectId)))
+      toast.success(`Project "${projectToDelete.name}" and associated tasks deleted successfully!`)
+      
     } catch (error) {
-      toast.error("Failed to delete project")
+      console.error("Error deleting project:", error)
+      const errorMessage = error.message || "Unknown error occurred"
+      toast.error(`Error deleting project: ${errorMessage}`)
     }
   }
 
