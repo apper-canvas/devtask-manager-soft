@@ -407,15 +407,14 @@ class TaskService {
 async getActiveTask() {
     try {
       // For mock purposes, return null since we don't have active task tracking in DB yet
-      return null;
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error getting active task:", error?.response?.data?.message);
       } else {
         console.error("Error getting active task:", error.message);
       }
-      return null;
     }
+    return null;
   }
 }
 
