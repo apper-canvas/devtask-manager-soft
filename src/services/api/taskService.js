@@ -404,7 +404,7 @@ class TaskService {
     }
   }
 
-  async getActiveTask() {
+async getActiveTask() {
     try {
       // For mock purposes, return null since we don't have active task tracking in DB yet
       return null;
