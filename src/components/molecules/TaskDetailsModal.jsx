@@ -146,7 +146,7 @@ const handleCancel = () => {
     }
   };
 
-  const getProject = () => {
+const getProject = () => {
     return projects.find(p => p.Id === parseInt(task?.projectId));
   };
 

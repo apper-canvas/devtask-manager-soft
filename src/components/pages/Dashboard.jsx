@@ -43,7 +43,7 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     .find(task => task.status === "inProgress") || tasks[0]
 
-  const recentTaskProject = recentTask ? projects.find(p => p.Id === recentTask.projectId) : null
+const recentTaskProject = recentTask ? projects.find(p => p.Id === recentTask.projectId) : null
 
   const stats = {
     totalTasks: tasks.length,

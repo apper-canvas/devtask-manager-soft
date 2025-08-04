@@ -30,7 +30,7 @@ const AddProjectModal = ({ isOpen, onClose, onProjectAdded }) => {
 
     setLoading(true)
     try {
-      const newProject = await projectService.create({
+const newProject = await projectService.create({
         ...formData,
         name: formData.name.trim(),
         description: formData.description.trim(),

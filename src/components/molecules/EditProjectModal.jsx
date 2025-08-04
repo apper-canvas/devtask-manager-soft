@@ -41,7 +41,7 @@ const EditProjectModal = ({ isOpen, onClose, project, onProjectUpdated }) => {
 
     setLoading(true)
     try {
-      const updatedProject = await projectService.update(project.Id, {
+const updatedProject = await projectService.update(project.Id, {
         ...formData,
         name: formData.name.trim(),
         description: formData.description.trim(),

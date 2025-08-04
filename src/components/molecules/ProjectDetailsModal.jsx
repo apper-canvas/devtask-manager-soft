@@ -25,7 +25,7 @@ const ProjectDetailsModal = ({ isOpen, onClose, project, tasks = [] }) => {
           <div className="flex items-center space-x-4">
             <div 
               className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold"
-              style={{ backgroundColor: project.color }}
+style={{ backgroundColor: project.color }}
             >
               {project.name.charAt(0).toUpperCase()}
             </div>
