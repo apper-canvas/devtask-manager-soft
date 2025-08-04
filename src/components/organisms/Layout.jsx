@@ -19,10 +19,10 @@ const Layout = () => {
           <Header />
         </div>
         
-        {/* Desktop Header with Logout */}
+{/* Desktop Header with Logout */}
         <div className="hidden lg:flex items-center justify-between p-6 border-b border-gray-600 bg-surface">
           <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-mono font-semibold text-white">Welcome back, {user?.firstName || 'Developer'}</h2>
+            <h2 className="text-lg font-mono font-semibold text-white">Ready to squash some bugs, {user?.firstName || 'Code Ninja'}? 🐛⚡</h2>
           </div>
           <button
             onClick={logout}
