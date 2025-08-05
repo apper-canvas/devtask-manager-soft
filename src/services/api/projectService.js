@@ -47,7 +47,100 @@ class ProjectService {
         name: project.Name || "",
         description: project.description_c || "",
         color: project.color_c || "#00D9FF",
-        createdAt: project.createdAt_c || new Date().toISOString(),
+createdAt: project.createdAt_c || new Date().toISOString(),
+        repositoryUrl: project.repositoryUrl_c || "",
+        tags: project.Tags || "",
+        owner: project.Owner || null
+      }));
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching projects:", error?.response?.data?.message);
+      } else {
+        console.error("Error fetching projects:", error.message);
+      }
+      return [];
+    }
+  }
+
+  async getAll() {
+    try {
+      // Initialize ApperClient with Project ID and Public Key
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          {
+            field: {
+              Name: "Name"
+            }
+          },
+          {
+            field: {
+              Name: "Tags"
+            }
+          },
+          {
+            field: {
+              Name: "Owner"
+            }
+          },
+          {
+            field: {
+              Name: "CreatedOn"
+            }
+          },
+          {
+            field: {
+              Name: "color_c"
+            }
+          },
+          {
+            field: {
+              Name: "createdAt_c"
+            }
+          },
+          {
+            field: {
+              Name: "description_c"
+            }
+          },
+          {
+            field: {
+              Name: "repositoryUrl_c"
+            }
+          }
+        ],
+        orderBy: [
+          {
+            fieldName: "CreatedOn",
+            sorttype: "DESC"
+          }
+        ]
+      };
+
+      const response = await apperClient.fetchRecords('project_c', params);
+
+      // Handle response
+      if (!response.success) {
+        console.error("Error fetching projects:", response.message);
+        return [];
+      }
+
+      if (!response.data || response.data.length === 0) {
+        return [];
+      }
+
+      // Map database fields to UI properties
+      return response.data.map(project => ({
+        id: project.Id,
+        name: project.Name || "",
+        description: project.description_c || "",
+        color: project.color_c || "#00D9FF",
+        createdAt: project.createdAt_c || project.CreatedOn || new Date().toISOString(),
         repositoryUrl: project.repositoryUrl_c || "",
         tags: project.Tags || "",
         owner: project.Owner || null
